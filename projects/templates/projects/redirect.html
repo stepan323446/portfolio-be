@@ -1,0 +1,193 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirect urls</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'projects/css/reset.css' %}">
+    <style>
+        * {
+            font-family: "Roboto", sans-serif;
+        }
+        body {
+            background: #dbdbdb;
+        }
+        header {
+            color: #fff;
+            background: #57af55;
+            text-align: center;
+            padding: 10px;
+
+            -webkit-box-shadow: 2px 6px 44px -15px rgba(0,0,0,0.43);
+            -moz-box-shadow: 2px 6px 44px -15px rgba(0,0,0,0.43);
+            box-shadow: 2px 6px 44px -15px rgba(0,0,0,0.43);
+        }
+        header h1 {
+            font-size: 24px;
+            font-weight: 500;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 50px auto;
+            padding: 10px;
+        }
+        .wrapper {
+            background: #fff;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        ul {
+            list-style: none;
+        }
+        .redirect-item {
+            display: flex;
+            justify-content: space-between;
+        }
+        .redirect-item h2 {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        .info {
+            flex-grow: 1;
+        }
+        .control {
+            display: flex;
+            flex-shrink: 1;
+        }
+        .url-wrap {
+            max-width: 250px;
+            display: -webkit-box !important;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            -webkit-line-clamp: 1;
+            word-break: break-word;
+        }
+        .info a {
+            color: #8f8f8f;
+            font-size: 14px;
+            
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px;
+            font-weight: 400;
+            margin-left: 5px;
+            color: #000;
+            border: 1px solid #7d7d7d;
+            background: #fff;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: 0.15s ease;
+        }
+        .btn:hover {
+            background: #d5d5d5;
+        }
+        .btn.btn-primary {
+            color: #fff;
+            font-weight: 500;
+            background: #3b8b00;
+        }
+        .btn.btn-primary:hover {
+            background: #2c6700;
+        }
+        .redirect-item {
+            padding-bottom: 10px;
+            border-bottom: 1px solid #c9c9c9;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Redirect urls</h1>
+    </header>
+    <div class="container">
+        <div class="wrapper">
+            {% if redirects %}
+            <ul>
+                {% for redirect in redirects %}
+                <li class="redirect-item" name="{{ redirect.name }}">
+                    <div class="info">
+                        <h2>{{ redirect.name }}</h2>
+                        <div class="url-wrap">
+
+                            <a href="{{ redirect.url }}">{{ redirect.url }}</a>
+                        </div>
+                    </div>
+                    <div class="control">
+
+                        <button class="btn copy-btn">
+                            Copy
+                        </button>
+                        <a href="{{ redirect.url }}" class="btn btn-primary">
+                            Go
+                        </a>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>Redirect urls not found</p>
+            {% endif %}
+        </div>
+        
+    </div>
+
+    <script>
+        let redirects = document.querySelectorAll(".redirect-item");
+        redirects?.forEach(redirect => {
+            let url = window.location.origin + "/redirect/" + redirect.getAttribute('name');
+            let copyBtn = redirect.querySelector('.copy-btn');
+
+            copyBtn.addEventListener('click', (e) => {
+                copyTextToClipboard(url);
+            })
+        });
+
+        function fallbackCopyTextToClipboard(text) {
+            var textArea = document.createElement("textarea");
+            textArea.value = text;
+            
+            // Avoid scrolling to bottom
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                var successful = document.execCommand('copy');
+                var msg = successful ? 'successful' : 'unsuccessful';
+                console.log('Fallback: Copying text command was ' + msg);
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+
+            document.body.removeChild(textArea);
+        }
+
+        function copyTextToClipboard(text) {
+        if (!navigator.clipboard) {
+            fallbackCopyTextToClipboard(text);
+            return;
+        }
+        navigator.clipboard.writeText(text).then(function() {
+            alert("Copied!")
+        }, function(err) {
+            console.error('Async: Could not copy text: ', err);
+        });
+        }
+    </script>
+</body>
+</html>
