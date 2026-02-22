@@ -1,0 +1,25 @@
+name: Django Deploying
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  deploying:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: appleboy/ssh-action@v0.1.8
+      with:
+        host: ${{ secrets.SSH_IP }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_SECRET_KEY }}
+        port: 22
+        script: |
+          cd /home/steve/sites/steve-dekart.xyz/portfolio-be/
+          source .venv/bin/activate
+          git pull
+          pip install -r requirements.txt
+          python3 manage.py migrate
+          python3 manage.py collectstatic
+          sudo systemctl restart portfolio.gunicorn.service
